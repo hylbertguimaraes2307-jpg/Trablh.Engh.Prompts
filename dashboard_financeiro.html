@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Financeiro — Vértice Tech S.A.</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+      border-radius: 9999px;
+    }
+    .badge-success {
+      background-color: color-mix(in srgb, var(--success) 15%, transparent);
+      color: var(--success);
+      border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+    }
+    .badge-warning {
+      background-color: color-mix(in srgb, var(--warning) 15%, transparent);
+      color: var(--warning);
+      border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+    }
+    .badge-error {
+      background-color: color-mix(in srgb, var(--error) 15%, transparent);
+      color: var(--error);
+      border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+    }
+    .badge-primary {
+      background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+      color: var(--primary);
+      border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    }
+    .badge-neutral {
+      background-color: color-mix(in srgb, var(--muted-foreground) 12%, transparent);
+      color: var(--muted-foreground);
+      border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    }
+    .tab-active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+    .tab-inactive {
+      color: var(--muted-foreground);
+    }
+    .tab-inactive:hover {
+      background-color: color-mix(in srgb, var(--foreground) 6%, transparent);
+      color: var(--foreground);
+    }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased m-0 p-0">
+  <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+
+    <!-- Header -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex items-start sm:items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 font-bold text-base"
+             style="background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary); border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);">
+          VT
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-lg md:text-xl font-semibold tracking-tight text-[var(--foreground)]">
+              Vértice Tech S.A.
+            </h1>
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium badge-primary">
+              Painel FP&amp;A 2026
+            </span>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] mt-0.5">
+            CNPJ 12.345.678/0001-90 • SaaS B2B &amp; Infraestrutura em Nuvem • Dados Gerenciais Consolidados (Fictício)
+          </p>
+        </div>
+      </div>
+
+      <!-- Global Filters -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <div class="flex flex-col gap-1">
+          <label for="filter-period" class="text-xs text-[var(--muted-foreground)]">Período</label>
+          <select id="filter-period"
+                  class="text-xs px-3 py-1.5 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]">
+            <option value="FY">2026 Completo (Jan–Dez)</option>
+            <option value="H1">1º Semestre (Jan–Jun)</option>
+            <option value="H2">2º Semestre (Jul–Dez)</option>
+            <option value="Q1">1º Trimestre (Q1)</option>
+            <option value="Q2">2º Trimestre (Q2)</option>
+            <option value="Q3">3º Trimestre (Q3)</option>
+            <option value="Q4">4º Trimestre (Q4)</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label for="filter-unit" class="text-xs text-[var(--muted-foreground)]">Unidade de Negócio</label>
+          <select id="filter-unit"
+                  class="text-xs px-3 py-1.5 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]">
+            <option value="all">Consolidado (Todas)</option>
+            <option value="cloud">Cloud Core</option>
+            <option value="ai">Dados &amp; IA</option>
+            <option value="enterprise">Serviços Enterprise</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label for="filter-view" class="text-xs text-[var(--muted-foreground)]">Visão</label>
+          <select id="filter-view"
+                  class="text-xs px-3 py-1.5 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]">
+            <option value="actual">Realizado vs. Orçado</option>
+            <option value="yoy">Realizado vs. Ano Anterior</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex flex-wrap items-center justify-between gap-3 bg-[var(--card)] border border-[var(--border)] rounded-xl p-1.5">
+      <div class="flex flex-wrap items-center gap-1" role="tablist">
+        <button type="button" data-tab="overview" class="tab-btn tab-active text-xs font-medium px-3.5 py-2 rounded-lg transition-colors">
+          Visão Executiva
+        </button>
+        <button type="button" data-tab="dre" class="tab-btn tab-inactive text-xs font-medium px-3.5 py-2 rounded-lg transition-colors">
+          DRE Gerencial
+        </button>
+        <button type="button" data-tab="cashflow" class="tab-btn tab-inactive text-xs font-medium px-3.5 py-2 rounded-lg transition-colors">
+          Fluxo de Caixa &amp; Lançamentos
+        </button>
+        <button type="button" data-tab="simulator" class="tab-btn tab-inactive text-xs font-medium px-3.5 py-2 rounded-lg transition-colors">
+          Simulador de Cenários
+        </button>
+      </div>
+      <div class="px-2 text-xs text-[var(--muted-foreground)] flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full" style="background: var(--success);"></span>
+        <span id="context-badge">Consolidado • 2026 Completo</span>
+      </div>
+    </nav>
+
+    <!-- TAB 1: VISÃO EXECUTIVA -->
+    <section id="tab-overview" class="tab-panel space-y-5">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="kpi-grid"></div>
+
+      <!-- Charts Row 1 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Main Monthly Performance Chart -->
+        <div class="lg:col-span-2 bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-semibold text-[var(--foreground)]" id="main-chart-title">
+                Evolução Mensal: Receita Líquida, Custos/OPEX e EBITDA
+              </h2>
+              <p class="text-xs text-[var(--muted-foreground)]">
+                Passe o mouse sobre os meses para ver o detalhamento e margens
+              </p>
+            </div>
+            <div class="flex items-center gap-1 bg-[var(--content)] p-1 rounded-lg border border-[var(--border)]">
+              <button type="button" id="btn-chart-dre" class="text-xs px-2.5 py-1 rounded-md font-medium tab-active">
+                Resultado
+              </button>
+              <button type="button" id="btn-chart-cash" class="text-xs px-2.5 py-1 rounded-md font-medium tab-inactive">
+                Fluxo de Caixa
+              </button>
+            </div>
+          </div>
+
+          <div class="relative w-full h-72">
+            <canvas id="canvas-main" class="w-full h-full block"></canvas>
+            <div id="tooltip-main"
+                 class="pointer-events-none hidden absolute z-20 px-3 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-lg text-xs min-w-[190px]">
+            </div>
+          </div>
+
+          <div id="legend-main" class="flex flex-wrap items-center gap-4 pt-1 border-t border-[var(--card-border)] text-xs text-[var(--muted-foreground)]"></div>
+        </div>
+
+        <!-- Revenue Mix & Unit Breakdown -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 flex flex-col justify-between gap-4">
+          <div>
+            <h2 class="text-sm font-semibold text-[var(--foreground)]">Mix por Unidade de Negócio</h2>
+            <p class="text-xs text-[var(--muted-foreground)]">Participação na Receita Líquida e Margem Bruta</p>
+          </div>
+
+          <div class="relative w-full h-48 flex items-center justify-center">
+            <canvas id="canvas-donut" class="w-full h-full block"></canvas>
+            <div id="donut-center" class="pointer-events-none absolute text-center">
+              <div class="text-xs text-[var(--muted-foreground)]">Receita Líq.</div>
+              <div id="donut-total" class="text-sm font-semibold tabular-nums text-[var(--foreground)]">-</div>
+            </div>
+          </div>
+
+          <div id="unit-breakdown-list" class="space-y-2.5 pt-2 border-t border-[var(--card-border)]"></div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2: Opex Breakdown & SaaS/Financial Indicators -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- OPEX Breakdown -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-[var(--foreground)]">Estrutura de Custos e Despesas</h2>
+              <p class="text-xs text-[var(--muted-foreground)]">Participação sobre a Receita Líquida no período</p>
+            </div>
+            <span id="total-cost-badge" class="text-xs font-medium px-2.5 py-1 rounded-full badge-neutral tabular-nums"></span>
+          </div>
+          <div id="cost-bars" class="space-y-3"></div>
+        </div>
+
+        <!-- Financial & SaaS Health Indicators -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-[var(--foreground)]">Indicadores de Eficiência &amp; Saúde</h2>
+              <p class="text-xs text-[var(--muted-foreground)]">Métricas operacionais, liquidez e retorno</p>
+            </div>
+            <span class="text-xs font-medium px-2.5 py-1 rounded-full badge-success">Saudável</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="health-metrics"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: DRE GERENCIAL -->
+    <section id="tab-dre" class="tab-panel hidden space-y-4">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-semibold text-[var(--foreground)]">Demonstrativo de Resultados do Exercício (DRE)</h2>
+            <p class="text-xs text-[var(--muted-foreground)]">
+              Valores gerenciais em R$ • Clique nas linhas com seta para expandir/recolher subcontas
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-dre-expand" class="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--content)] text-[var(--foreground)] hover:border-[var(--primary)]">
+              Expandir Tudo
+            </button>
+            <button type="button" id="btn-export-dre" class="text-xs px-3 py-1.5 rounded-lg font-medium tab-active">
+              Exportar DRE (CSV)
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                <th class="py-2.5 pr-4 font-medium">Conta Contábil / Gerencial</th>
+                <th class="py-2.5 px-3 font-medium text-right">Realizado (R$)</th>
+                <th class="py-2.5 px-3 font-medium text-right">AV (%)</th>
+                <th class="py-2.5 px-3 font-medium text-right" id="dre-comp-header">Orçado (R$)</th>
+                <th class="py-2.5 px-3 font-medium text-right">Desvio (R$)</th>
+                <th class="py-2.5 pl-3 font-medium text-right">AH (%)</th>
+              </tr>
+            </thead>
+            <tbody id="dre-tbody" class="divide-y divide-[var(--card-border)]"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: FLUXO DE CAIXA & LANÇAMENTOS -->
+    <section id="tab-cashflow" class="tab-panel hidden space-y-4">
+      <!-- Cash Balance Evolution -->
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-semibold text-[var(--foreground)]">Saldo de Caixa Acumulado e Geração Líquida</h2>
+            <p class="text-xs text-[var(--muted-foreground)]">
+              Saldo inicial em 01/01/2026: R$ 14.200.000 • Inclui lançamentos simulados adicionados abaixo
+            </p>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="text-[var(--muted-foreground)]">Caixa Final do Período:</span>
+            <span id="cf-ending-cash" class="font-semibold text-sm tabular-nums text-[var(--foreground)]">-</span>
+          </div>
+        </div>
+        <div class="relative w-full h-64">
+          <canvas id="canvas-cash-line" class="w-full h-full block"></canvas>
+          <div id="tooltip-cash-line"
+               class="pointer-events-none hidden absolute z-20 px-3 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-lg text-xs min-w-[180px]">
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Transaction + Ledger Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Quick Add Form -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-3">
+          <div>
+            <h3 class="text-sm font-semibold text-[var(--foreground)]">Novo Lançamento (Simulação)</h3>
+            <p class="text-xs text-[var(--muted-foreground)]">Adicione uma movimentação para testar o impacto no caixa</p>
+          </div>
+          <form id="tx-form" class="space-y-3">
+            <div>
+              <label for="tx-desc" class="block text-xs text-[var(--muted-foreground)] mb-1">Descrição</label>
+              <input id="tx-desc" type="text" required placeholder="Ex: Contrato Anual Cliente Alpha"
+                     class="w-full text-xs px-3 py-2 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]" />
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="tx-type" class="block text-xs text-[var(--muted-foreground)] mb-1">Tipo</label>
+                <select id="tx-type"
+                        class="w-full text-xs px-2.5 py-2 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)]">
+                  <option value="entrada">Entrada (+)</option>
+                  <option value="saida">Saída (-)</option>
+                </select>
+              </div>
+              <div>
+                <label for="tx-amount" class="block text-xs text-[var(--muted-foreground)] mb-1">Valor (R$)</label>
+                <input id="tx-amount" type="number" min="100" step="100" required value="150000"
+                       class="w-full text-xs px-3 py-2 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)] tabular-nums" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="tx-unit" class="block text-xs text-[var(--muted-foreground)] mb-1">Unidade</label>
+                <select id="tx-unit"
+                        class="w-full text-xs px-2.5 py-2 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)]">
+                  <option value="cloud">Cloud Core</option>
+                  <option value="ai">Dados &amp; IA</option>
+                  <option value="enterprise">Serviços Enterprise</option>
+                </select>
+              </div>
+              <div>
+                <label for="tx-status" class="block text-xs text-[var(--muted-foreground)] mb-1">Status</label>
+                <select id="tx-status"
+                        class="w-full text-xs px-2.5 py-2 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)]">
+                  <option value="Liquidado">Liquidado</option>
+                  <option value="Previsto">Previsto</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="w-full text-xs font-medium py-2 rounded-lg tab-active transition-opacity hover:opacity-90">
+              Adicionar ao Caixa
+            </button>
+          </form>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="lg:col-span-2 bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-semibold text-[var(--foreground)]">Movimentações Financeiras</h3>
+              <p class="text-xs text-[var(--muted-foreground)]" id="tx-count-label">Exibindo lançamentos</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="tx-search" type="search" placeholder="Buscar descrição ou categoria..."
+                     class="text-xs px-3 py-1.5 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)] w-48 focus:outline-none focus:border-[var(--primary)]" />
+              <select id="tx-filter-type"
+                      class="text-xs px-2.5 py-1.5 rounded-lg bg-[var(--content)] border border-[var(--border)] text-[var(--foreground)]">
+                <option value="all">Todos os Tipos</option>
+                <option value="entrada">Entradas</option>
+                <option value="saida">Saídas</option>
+              </select>
+              <button type="button" id="btn-export-tx" class="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--content)] text-[var(--foreground)] hover:border-[var(--primary)]">
+                Exportar CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto custom-scroll max-h-80 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="sticky top-0 bg-[var(--card)] border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                <tr>
+                  <th class="py-2 pr-3 font-medium">Data</th>
+                  <th class="py-2 px-3 font-medium">Descrição</th>
+                  <th class="py-2 px-3 font-medium">Categoria</th>
+                  <th class="py-2 px-3 font-medium">Status</th>
+                  <th class="py-2 pl-3 font-medium text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="tx-tbody" class="divide-y divide-[var(--card-border)]"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SIMULADOR DE CENÁRIOS -->
+    <section id="tab-simulator" class="tab-panel hidden space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Sliders -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-[var(--foreground)]">Premissas de Projeção (2027)</h2>
+              <p class="text-xs text-[var(--muted-foreground)]">Ajuste as alavancas sobre a base de 2026</p>
+            </div>
+            <button type="button" id="btn-reset-sim" class="text-xs text-[var(--link)] hover:underline">
+              Resetar
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="sim-growth" class="text-[var(--muted-foreground)]">Crescimento da Receita</label>
+                <span id="sim-growth-val" class="font-semibold tabular-nums text-[var(--foreground)]">+22%</span>
+              </div>
+              <input id="sim-growth" type="range" min="-15" max="60" value="22" class="w-full accent-[var(--primary)]" />
+              <div class="flex justify-between text-xs text-[var(--muted-foreground)] mt-0.5">
+                <span>-15%</span><span>Base 0%</span><span>+60%</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="sim-cloud-eff" class="text-[var(--muted-foreground)]">Eficiência de Infra/CPV</label>
+                <span id="sim-cloud-eff-val" class="font-semibold tabular-nums text-[var(--foreground)]">-4%</span>
+              </div>
+              <input id="sim-cloud-eff" type="range" min="-20" max="15" value="-4" class="w-full accent-[var(--primary)]" />
+              <div class="flex justify-between text-xs text-[var(--muted-foreground)] mt-0.5">
+                <span>-20% custo</span><span>0%</span><span>+15% custo</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="sim-opex" class="text-[var(--muted-foreground)]">Variação de OPEX (Time &amp; Mkt)</label>
+                <span id="sim-opex-val" class="font-semibold tabular-nums text-[var(--foreground)]">+10%</span>
+              </div>
+              <input id="sim-opex" type="range" min="-15" max="40" value="10" class="w-full accent-[var(--primary)]" />
+              <div class="flex justify-between text-xs text-[var(--muted-foreground)] mt-0.5">
+                <span>-15%</span><span>0%</span><span>+40%</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="sim-churn" class="text-[var(--muted-foreground)]">Pressão de Churn / Descontos</label>
+                <span id="sim-churn-val" class="font-semibold tabular-nums text-[var(--foreground)]">2.0%</span>
+              </div>
+              <input id="sim-churn" type="range" min="0" max="12" step="0.5" value="2" class="w-full accent-[var(--primary)]" />
+              <div class="flex justify-between text-xs text-[var(--muted-foreground)] mt-0.5">
+                <span>0%</span><span>6%</span><span>12%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[var(--card-border)] flex flex-wrap gap-2">
+            <button type="button" data-preset="conservador" class="preset-btn text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--content)] text-[var(--foreground)] hover:border-[var(--primary)]">
+              Conservador
+            </button>
+            <button type="button" data-preset="base" class="preset-btn text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--content)] text-[var(--foreground)] hover:border-[var(--primary)]">
+              Caso Base
+            </button>
+            <button type="button" data-preset="agressivo" class="preset-btn text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--content)] text-[var(--foreground)] hover:border-[var(--primary)]">
+              Expansão Acelerada
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulation Output & Chart -->
+        <div class="lg:col-span-2 bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 md:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-semibold text-[var(--foreground)]">Comparativo: Realizado 2026 vs. Projetado 2027</h2>
+              <p class="text-xs text-[var(--muted-foreground)]">Impacto imediato na margem EBITDA, Lucro Líquido e Caixa Final</p>
+            </div>
+            <span id="sim-rule40-badge" class="text-xs font-medium px-2.5 py-1 rounded-full badge-primary">Rule of 40: -</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="sim-kpi-cards"></div>
+
+          <div class="relative w-full h-64">
+            <canvas id="canvas-sim" class="w-full h-full block"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. DADOS FICTÍCIOS DA EMPRESA (Fonte Única de Verdade)
+      // =========================================================================
+      const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const PERIOD_RANGES = {
+        FY: [0, 11],
+        H1: [0, 5],
+        H2: [6, 11],
+        Q1: [0, 2],
+        Q2: [3, 5],
+        Q3: [6, 8],
+        Q4: [9, 11]
+      };
+      const UNITS = {
+        cloud: { name: 'Cloud Core', colorVar: '--chart-1', shareTarget: 0.52 },
+        ai: { name: 'Dados & IA', colorVar: '--chart-2', shareTarget: 0.31 },
+        enterprise: { name: 'Serviços Enterprise', colorVar: '--chart-3', shareTarget: 0.17 }
+      };
+
+      const INITIAL_CASH = 14200000;
+
+      // Base monthly gross revenue (R$) per unit for 2026 (growing trajectory with Q4 seasonality)
+      const baseGrossByUnit = {
+        cloud:      [1920000, 1960000, 2030000, 2080000, 2140000, 2210000, 2250000, 2310000, 2390000, 2460000, 2550000, 2680000],
+        ai:         [1040000, 1090000, 1160000, 1210000, 1290000, 1360000, 1410000, 1480000, 1550000, 1620000, 1710000, 1820000],
+        enterprise: [ 680000,  660000,  710000,  690000,  720000,  750000,  730000,  760000,  790000,  810000,  840000,  890000]
+      };
+
+      // Generate consistent monthly dataset for each unit
+      function buildMonthlyRecords() {
+        const records = [];
+        const taxRate = 0.118; // Impostos sobre faturamento (ISS, PIS, COFINS)
+        const cogsRates = { cloud: 0.21, ai: 0.25, enterprise: 0.46 };
+        const budgetFactor = [1.02, 1.01, 0.99, 1.01, 0.98, 0.97, 0.99, 0.98, 0.96, 0.97, 0.95, 0.94];
+        const yoyFactor = 0.81; // 2025 foi ~19% menor
+
+        for (let m = 0; m < 12; m++) {
+          const monthRow = { monthIndex: m, label: MONTHS[m], units: {} };
+
+          Object.keys(UNITS).forEach((uKey) => {
+            const grossActual = baseGrossByUnit[uKey][m];
+            const dedActual = Math.round(grossActual * taxRate);
+            const netActual = grossActual - dedActual;
+            const cogsActual = Math.round(netActual * cogsRates[uKey]);
+            const grossProfitActual = netActual - cogsActual;
+
+            // OPEX ratios slowly improve with scale along the year
+            const scaleAdj = 1 - m * 0.004;
+            const opexPessoal = Math.round(netActual * (uKey === 'enterprise' ? 0.22 : 0.19) * scaleAdj);
+            const opexMkt = Math.round(netActual * (uKey === 'ai' ? 0.16 : 0.11) * scaleAdj);
+            const opexPd = Math.round(netActual * (uKey === 'enterprise' ? 0.04 : 0.12) * scaleAdj);
+            const opexGa = Math.round(netActual * 0.075 * scaleAdj);
+            const opexTotal = opexPessoal + opexMkt + opexPd + opexGa;
+
+            const ebitdaActual = grossProfitActual - opexTotal;
+            const daActual = Math.round(netActual * 0.038);
+            const ebitActual = ebitdaActual - daActual;
+            // Financial result: positive yield on cash minus small debt interest
+            const finResultActual = Math.round(netActual * 0.012);
+            const ebtActual = ebitActual + finResultActual;
+            const irCsllActual = ebtActual > 0 ? Math.round(ebtActual * 0.24) : 0;
+            const netIncomeActual = ebtActual - irCsllActual;
+
+            // Cash flow components
+            const fco = ebitdaActual - irCsllActual + finResultActual - Math.round(netActual * 0.015); // working cap
+            const fci = -Math.round(netActual * 0.045); // Capex & capitalized R&D
+            const fcf = m % 3 === 2 ? -Math.round(netActual * 0.06) : -Math.round(netActual * 0.012); // quarterly dividend/debt amort
+
+            // Budget & YoY
+            const bMult = budgetFactor[m];
+            const grossBudget = Math.round(grossActual * bMult);
+            const dedBudget = Math.round(grossBudget * taxRate);
+            const netBudget = grossBudget - dedBudget;
+            const cogsBudget = Math.round(netBudget * (cogsRates[uKey] + 0.008));
+            const grossProfitBudget = netBudget - cogsBudget;
+            const opexBudget = Math.round(opexTotal * 1.015);
+            const ebitdaBudget = grossProfitBudget - opexBudget;
+            const daBudget = daActual;
+            const ebitBudget = ebitdaBudget - daBudget;
+            const finResultBudget = Math.round(finResultActual * 0.95);
+            const ebtBudget = ebitBudget + finResultBudget;
+            const irCsllBudget = ebtBudget > 0 ? Math.round(ebtBudget * 0.24) : 0;
+            const netIncomeBudget = ebtBudget - irCsllBudget;
+
+            const netYoy = Math.round(netActual * yoyFactor);
+            const ebitdaYoy = Math.round(ebitdaActual * (yoyFactor - 0.05));
+            const netIncomeYoy = Math.round(netIncomeActual * (yoyFactor - 0.07));
+
+            monthRow.units[uKey] = {
+              actual: {
+                grossRev: grossActual,
+                deductions: dedActual,
+                netRev: netActual,
+                cogs: cogsActual,
+                grossProfit: grossProfitActual,
+                opexPessoal,
+                opexMkt,
+                opexPd,
+                opexGa,
+                opexTotal,
+                ebitda: ebitdaActual,
+                da: daActual,
+                ebit: ebitActual,
+                finResult: finResultActual,
+                ebt: ebtActual,
+                irCsll: irCsllActual,
+                netIncome: netIncomeActual,
+                fco,
+                fci,
+                fcf,
+                netCash: fco + fci + fcf
+              },
+              budget: {
+                grossRev: grossBudget,
+                deductions: dedBudget,
+                netRev: netBudget,
+                cogs: cogsBudget,
+                grossProfit: grossProfitBudget,
+                opexPessoal: Math.round(opexPessoal * 1.01),
+                opexMkt: Math.round(opexMkt * 1.02),
+                opexPd: Math.round(opexPd * 1.01),
+                opexGa: Math.round(opexGa * 1.02),
+                opexTotal: opexBudget,
+                ebitda: ebitdaBudget,
+                da: daBudget,
+                ebit: ebitBudget,
+                finResult: finResultBudget,
+                ebt: ebtBudget,
+                irCsll: irCsllBudget,
+                netIncome: netIncomeBudget
+              },
+              yoy: {
+                netRev: netYoy,
+                ebitda: ebitdaYoy,
+                netIncome: netIncomeYoy,
+                grossRev: Math.round(grossActual * yoyFactor),
+                deductions: Math.round(dedActual * yoyFactor),
+                cogs: Math.round(cogsActual * (yoyFactor + 0.02)),
+                grossProfit: Math.round(grossProfitActual * yoyFactor),
+                opexPessoal: Math.round(opexPessoal * 0.88),
+                opexMkt: Math.round(opexMkt * 0.85),
+                opexPd: Math.round(opexPd * 0.84),
+                opexGa: Math.round(opexGa * 0.90),
+                opexTotal: Math.round(opexTotal * 0.87),
+                da: Math.round(daActual * 0.9),
+                ebit: Math.round(ebitActual * 0.75),
+                finResult: Math.round(finResultActual * 0.8),
+                ebt: Math.round(ebtActual * 0.75),
+                irCsll: Math.round(irCsllActual * 0.75)
+              }
+            };
+          });
+
+          records.push(monthRow);
+        }
+        return records;
+      }
+
+      const MONTHLY_DATA = buildMonthlyRecords();
+
+      // Ledger transactions (initial realistic sample)
+      const transactions = [
+        { id: 1, date: '2026-11-22', monthIndex: 10, desc: 'Renovação Anual — Grupo Horizonte S.A.', category: 'Receita SaaS', unit: 'cloud', type: 'entrada', status: 'Liquidado', amount: 420000 },
+        { id: 2, date: '2026-11-20', monthIndex: 10, desc: 'Fatura AWS / GCP Cluster Produção', category: 'Infraestrutura Cloud', unit: 'cloud', type: 'saida', status: 'Liquidado', amount: 318500 },
+        { id: 3, date: '2026-11-18', monthIndex: 10, desc: 'Implantação Plataforma Dados & IA — Banco Sul', category: 'Dados & IA', unit: 'ai', type: 'entrada', status: 'Liquidado', amount: 285000 },
+        { id: 4, date: '2026-11-15', monthIndex: 10, desc: 'Folha de Pagamento & Encargos (Nov/26)', category: 'Pessoal', unit: 'cloud', type: 'saida', status: 'Liquidado', amount: 745000 },
+        { id: 5, date: '2026-11-12', monthIndex: 10, desc: 'Campanha LinkedIn & Eventos Enterprise', category: 'Marketing & Vendas', unit: 'ai', type: 'saida', status: 'Liquidado', amount: 142000 },
+        { id: 6, date: '2026-11-10', monthIndex: 10, desc: 'Consultoria Arquitetura — Varejo Brasil', category: 'Serviços Enterprise', unit: 'enterprise', type: 'entrada', status: 'Liquidado', amount: 196000 },
+        { id: 7, date: '2026-11-28', monthIndex: 10, desc: 'Licenciamento Enterprise Q4 — Logística Norte', category: 'Receita SaaS', unit: 'cloud', type: 'entrada', status: 'Previsto', amount: 310000 },
+        { id: 8, date: '2026-12-05', monthIndex: 11, desc: 'Parcela 13º Salário + Encargos', category: 'Pessoal', unit: 'enterprise', type: 'saida', status: 'Previsto', amount: 390000 },
+        { id: 9, date: '2026-12-10', monthIndex: 11, desc: 'Expansão Licenças GPU Analytics — Energia BR', category: 'Dados & IA', unit: 'ai', type: 'entrada', status: 'Previsto', amount: 465000 },
+        { id: 10, date: '2026-10-29', monthIndex: 9, desc: 'Recolhimento IRPJ / CSLL Trimestral', category: 'Impostos', unit: 'cloud', type: 'saida', status: 'Liquidado', amount: 512000 },
+        { id: 11, date: '2026-10-21', monthIndex: 9, desc: 'Faturamento Recorrente Carteira PME', category: 'Receita SaaS', unit: 'cloud', type: 'entrada', status: 'Liquidado', amount: 890000 },
+        { id: 12, date: '2026-10-14', monthIndex: 9, desc: 'Licenças Segurança & Observabilidade', category: 'G&A / Software', unit: 'ai', type: 'saida', status: 'Liquidado', amount: 94000 }
+      ];
+
+      // =========================================================================
+      // 2. ESTADO DA APLICAÇÃO
+      // =========================================================================
+      const state = {
+        activeTab: 'overview',
+        period: 'FY',
+        unit: 'all',
+        view: 'actual', // 'actual' (vs budget) | 'yoy' (vs prior year)
+        mainChartMode: 'dre', // 'dre' | 'cash'
+        dreExpanded: { opex: true, ded: false },
+        sim: { growth: 22, cloudEff: -4, opex: 10, churn: 2.0 },
+        extraCashByMonth: new Array(12).fill(0) // from user simulated transactions
+      };
+
+      // =========================================================================
+      // 3. FORMATAÇÃO & HELPERS
+      // =========================================================================
+      const fmtBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+      const fmtBRLDec = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fmtPct = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+      function formatCompactBRL(val) {
+        const abs = Math.abs(val);
+        const sign = val < 0 ? '-' : '';
+        if (abs >= 1e6) return `${sign}R$ ${(abs / 1e6).toFixed(2).replace('.', ',')} mi`;
+        if (abs >= 1e3) return `${sign}R$ ${(abs / 1e3).toFixed(0)} mil`;
+        return fmtBRL.format(val);
+      }
+
+      function cssVar(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#3b82f6';
+      }
+
+      function getFilteredMonths() {
+        const [start, end] = PERIOD_RANGES[state.period];
+        const unitKeys = state.unit === 'all' ? Object.keys(UNITS) : [state.unit];
+
+        let runningCash = INITIAL_CASH;
+        const allMonthsWithCash = MONTHLY_DATA.map((mRow, idx) => {
+          const agg = {
+            monthIndex: idx,
+            label: mRow.label,
+            actual: {},
+            budget: {},
+            yoy: {}
+          };
+          const keysActual = Object.keys(mRow.units.cloud.actual);
+          keysActual.forEach((k) => { agg.actual[k] = 0; });
+          Object.keys(mRow.units.cloud.budget).forEach((k) => { agg.budget[k] = 0; });
+          Object.keys(mRow.units.cloud.yoy).forEach((k) => { agg.yoy[k] = 0; });
+
+          unitKeys.forEach((u) => {
+            const uData = mRow.units[u];
+            keysActual.forEach((k) => { agg.actual[k] += uData.actual[k]; });
+            Object.keys(uData.budget).forEach((k) => { agg.budget[k] += uData.budget[k]; });
+            Object.keys(uData.yoy).forEach((k) => { agg.yoy[k] += uData.yoy[k]; });
+          });
+
+          const extra = state.extraCashByMonth[idx] || 0;
+          agg.actual.netCash += extra;
+          agg.actual.fco += extra;
+          runningCash += agg.actual.netCash;
+          agg.endingCash = runningCash;
+          return agg;
+        });
+
+        return allMonthsWithCash.slice(start, end + 1);
+      }
+
+      function sumMetrics(months) {
+        const totals = { actual: {}, comp: {} };
+        const compKey = state.view === 'actual' ? 'budget' : 'yoy';
+        if (!months.length) return totals;
+
+        Object.keys(months[0].actual).forEach((k) => {
+          totals.actual[k] = months.reduce((acc, m) => acc + (m.actual[k] || 0), 0);
+        });
+        Object.keys(months[0][compKey]).forEach((k) => {
+          totals.comp[k] = months.reduce((acc, m) => acc + (m[compKey][k] || 0), 0);
+        });
+        totals.endingCash = months[months.length - 1].endingCash;
+        return totals;
+      }
+
+      // =========================================================================
+      // 4. RENDERIZAÇÃO: VISÃO EXECUTIVA
+      // =========================================================================
+      function renderKPIs(months, totals) {
+        const a = totals.actual;
+        const c = totals.comp;
+        const compLabel = state.view === 'actual' ? 'vs. Orçado' : 'vs. 2025';
+
+        const ebitdaMargin = a.netRev ? (a.ebitda / a.netRev) * 100 : 0;
+        const netMargin = a.netRev ? (a.netIncome / a.netRev) * 100 : 0;
+        const ebitdaMarginComp = c.netRev ? (c.ebitda / c.netRev) * 100 : 0;
+
+        const cards = [
+          {
+            title: 'Receita Líquida',
+            value: formatCompactBRL(a.netRev),
+            exact: fmtBRL.format(a.netRev),
+            deltaPct: c.netRev ? ((a.netRev - c.netRev) / Math.abs(c.netRev)) * 100 : 0,
+            sub: `Receita Bruta: ${formatCompactBRL(a.grossRev)}`,
+            spark: months.map((m) => m.actual.netRev),
+            colorVar: '--chart-1'
+          },
+          {
+            title: 'EBITDA Gerencial',
+            value: formatCompactBRL(a.ebitda),
+            exact: `Margem: ${fmtPct.format(ebitdaMargin)}%`,
+            deltaPct: c.ebitda ? ((a.ebitda - c.ebitda) / Math.abs(c.ebitda)) * 100 : 0,
+            sub: `Margem ${compLabel}: ${fmtPct.format(ebitdaMarginComp)}%`,
+            spark: months.map((m) => m.actual.ebitda),
+            colorVar: '--chart-2'
+          },
+          {
+            title: 'Lucro Líquido',
+            value: formatCompactBRL(a.netIncome),
+            exact: `Margem Líq.: ${fmtPct.format(netMargin)}%`,
+            deltaPct: c.netIncome ? ((a.netIncome - c.netIncome) / Math.abs(c.netIncome)) * 100 : 0,
+            sub: `IR/CSLL: ${formatCompactBRL(a.irCsll)}`,
+            spark: months.map((m) => m.actual.netIncome),
+            colorVar: '--chart-3'
+          },
+          {
+            title: 'Caixa Disponível',
+            value: formatCompactBRL(totals.endingCash),
+            exact: `Geração no período: ${a.netCash >= 0 ? '+' : ''}${formatCompactBRL(a.netCash)}`,
+            deltaPct: a.netRev ? (a.fco / a.netRev) * 100 : 0,
+            isMarginBadge: true,
+            badgeText: `FCO ${fmtPct.format(a.netRev ? (a.fco / a.netRev) * 100 : 0)}% rec.`,
+            sub: `FCO: ${formatCompactBRL(a.fco)} | Capex: ${formatCompactBRL(a.fci)}`,
+            spark: months.map((m) => m.endingCash),
+            colorVar: '--chart-4'
+          }
+        ];
+
+        const container = document.getElementById('kpi-grid');
+        container.innerHTML = cards.map((card, i) => {
+          const isPositive = card.deltaPct >= 0;
+          const badgeCls = card.isMarginBadge ? 'badge-primary' : (isPositive ? 'badge-success' : 'badge-error');
+          const badgeLabel = card.isMarginBadge
+            ? card.badgeText
+            : `${isPositive ? '+' : ''}${fmtPct.format(card.deltaPct)}% ${compLabel}`;
+
+          return `
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between gap-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="text-xs text-[var(--muted-foreground)] font-medium">${card.title}</div>
+                  <div class="text-xl font-bold tracking-tight tabular-nums text-[var(--foreground)] mt-1">${card.value}</div>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium tabular-nums shrink-0 ${badgeCls}">
+                  ${badgeLabel}
+                </span>
+              </div>
+              <div class="flex items-end justify-between gap-3">
+                <div class="text-xs text-[var(--muted-foreground)] space-y-0.5">
+                  <div class="text-[var(--foreground)] font-medium tabular-nums">${card.exact}</div>
+                  <div class="tabular-nums">${card.sub}</div>
+                </div>
+                <svg class="w-20 h-9 shrink-0" viewBox="0 0 80 36" aria-hidden="true">
+                  ${buildSparklineSVG(card.spark, card.colorVar)}
+                </svg>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function buildSparklineSVG(values, colorVar) {
+        if (!values || values.length < 2) return '';
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const span = max - min || 1;
+        const pts = values.map((v, idx) => {
+          const x = 4 + (idx / (values.length - 1)) * 72;
+          const y = 32 - ((v - min) / span) * 26;
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(' ');
+        const last = pts.split(' ').pop().split(',');
+        return `
+          <polyline fill="none" stroke="var(${colorVar})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${pts}" />
+          <circle cx="${last[0]}" cy="${last[1]}" r="2.8" fill="var(${colorVar})" />
+        `;
+      }
+
+      function renderUnitBreakdown(totals) {
+        const [start, end] = PERIOD_RANGES[state.period];
+        const slice = MONTHLY_DATA.slice(start, end + 1);
+        const unitSummaries = Object.keys(UNITS).map((uKey) => {
+          const netRev = slice.reduce((acc, m) => acc + m.units[uKey].actual.netRev, 0);
+          const grossProfit = slice.reduce((acc, m) => acc + m.units[uKey].actual.grossProfit, 0);
+          const ebitda = slice.reduce((acc, m) => acc + m.units[uKey].actual.ebitda, 0);
+          return {
+            key: uKey,
+            name: UNITS[uKey].name,
+            colorVar: UNITS[uKey].colorVar,
+            netRev,
+            grossMargin: netRev ? (grossProfit / netRev) * 100 : 0,
+            ebitdaMargin: netRev ? (ebitda / netRev) * 100 : 0,
+            active: state.unit === 'all' || state.unit === uKey
+          };
+        });
+
+        const totalAll = unitSummaries.reduce((acc, u) => acc + u.netRev, 0);
+        document.getElementById('donut-total').textContent = formatCompactBRL(totals.actual.netRev);
+
+        const listEl = document.getElementById('unit-breakdown-list');
+        listEl.innerHTML = unitSummaries.map((u) => {
+          const share = totalAll ? (u.netRev / totalAll) * 100 : 0;
+          const opacityCls = u.active ? 'opacity-100' : 'opacity-40';
+          return `
+            <div class="flex items-center justify-between gap-2 text-xs ${opacityCls}">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background: var(${u.colorVar});"></span>
+                <div class="truncate">
+                  <div class="font-medium text-[var(--foreground)] truncate">${u.name}</div>
+                  <div class="text-[var(--muted-foreground)]">Mg. Bruta ${fmtPct.format(u.grossMargin)}%</div>
+                </div>
+              </div>
+              <div class="text-right tabular-nums shrink-0">
+                <div class="font-semibold text-[var(--foreground)]">${formatCompactBRL(u.netRev)}</div>
+                <div class="text-[var(--muted-foreground)]">${fmtPct.format(share)}%</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        drawDonutChart(unitSummaries);
+      }
+
+      function renderCostBars(totals) {
+        const a = totals.actual;
+        const totalCosts = a.cogs + a.opexTotal;
+        const pctTotal = a.netRev ? (totalCosts / a.netRev) * 100 : 0;
+        document.getElementById('total-cost-badge').textContent = `${fmtPct.format(pctTotal)}% da Receita Líq.`;
+
+        const items = [
+          { label: 'CPV / Infraestrutura Cloud Direta', val: a.cogs, colorVar: '--chart-1' },
+          { label: 'Pessoal & Encargos (OPEX)', val: a.opexPessoal, colorVar: '--chart-2' },
+          { label: 'Marketing & Vendas', val: a.opexMkt, colorVar: '--chart-3' },
+          { label: 'Pesquisa & Desenvolvimento (P&D)', val: a.opexPd, colorVar: '--chart-4' },
+          { label: 'Despesas Gerais & Adm. (G&A)', val: a.opexGa, colorVar: '--chart-5' }
+        ];
+
+        const container = document.getElementById('cost-bars');
+        container.innerHTML = items.map((item) => {
+          const pctRev = a.netRev ? (item.val / a.netRev) * 100 : 0;
+          const barWidth = Math.min(100, (pctRev / 35) * 100);
+          return `
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-[var(--foreground)] font-medium">${item.label}</span>
+                <span class="tabular-nums text-[var(--muted-foreground)]">
+                  <strong class="text-[var(--foreground)]">${formatCompactBRL(item.val)}</strong> (${fmtPct.format(pctRev)}%)
+                </span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[var(--content)] overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300"
+                     style="width: ${barWidth.toFixed(1)}%; background: var(${item.colorVar});"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderHealthMetrics(totals) {
+        const a = totals.actual;
+        const grossMargin = a.netRev ? (a.grossProfit / a.netRev) * 100 : 0;
+        const ebitdaMargin = a.netRev ? (a.ebitda / a.netRev) * 100 : 0;
+        const cashConversion = a.ebitda ? (a.fco / a.ebitda) * 100 : 0;
+        const growthYoY = totals.comp && state.view === 'yoy' && totals.comp.netRev
+          ? ((a.netRev - totals.comp.netRev) / totals.comp.netRev) * 100
+          : 23.4;
+        const ruleOf40 = growthYoY + ebitdaMargin;
+
+        const metrics = [
+          { label: 'Margem Bruta', val: `${fmtPct.format(grossMargin)}%`, hint: 'Meta ≥ 70%' },
+          { label: 'Conversão Caixa (FCO/EBITDA)', val: `${fmtPct.format(cashConversion)}%`, hint: 'Excelente ≥ 75%' },
+          { label: 'Rule of 40', val: `${fmtPct.format(ruleOf40)} pts`, hint: 'Cresc. + Mg. EBITDA' },
+          { label: 'Liquidez Corrente', val: '2,65x', hint: 'Ativo / Passivo Circ.' },
+          { label: 'LTV / CAC', val: '4,8x', hint: 'Payback: 11 meses' },
+          { label: 'Inadimplência (>30d)', val: '1,3%', hint: 'Meta ≤ 2,0%' }
+        ];
+
+        document.getElementById('health-metrics').innerHTML = metrics.map((m) => `
+          <div class="p-3 rounded-lg bg-[var(--content)] border border-[var(--card-border)] space-y-1">
+            <div class="text-xs text-[var(--muted-foreground)]">${m.label}</div>
+            <div class="text-base font-semibold tabular-nums text-[var(--foreground)]">${m.val}</div>
+            <div class="text-xs text-[var(--muted-foreground)]">${m.hint}</div>
+          </div>
+        `).join('');
+      }
+
+      // =========================================================================
+      // 5. GRÁFICOS EM CANVAS (Com suporte a Theme Change & Tooltip)
+      // =========================================================================
+      let mainChartState = { bars: [] };
+      let cashLineState = { points: [] };
+
+      function setupCanvas(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return null;
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { ctx, w: rect.width, h: rect.height };
+      }
+
+      function drawMainChart(months) {
+        const canvas = document.getElementById('canvas-main');
+        const setup = setupCanvas(canvas);
+        if (!setup) return;
+        const { ctx, w, h } = setup;
+
+        const fg = cssVar('--foreground');
+        const muted = cssVar('--muted-foreground');
+        const gridColor = cssVar('--card-border');
+        const c1 = cssVar('--chart-1');
+        const c2 = cssVar('--chart-2');
+        const c3 = cssVar('--chart-3');
+        const c4 = cssVar('--chart-4');
+
+        const pad = { top: 20, right: 16, bottom: 28, left: 58 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+
+        const isDre = state.mainChartMode === 'dre';
+        document.getElementById('main-chart-title').textContent = isDre
+          ? 'Evolução Mensal: Receita Líquida, Custos/OPEX e EBITDA'
+          : 'Fluxo de Caixa Mensal: Operacional (FCO), Capex (FCI) e Geração Líquida';
+
+        const seriesA = months.map((m) => isDre ? m.actual.netRev : m.actual.fco);
+        const seriesB = months.map((m) => isDre ? (m.actual.cogs + m.actual.opexTotal) : Math.abs(m.actual.fci + m.actual.fcf));
+        const seriesLine = months.map((m) => isDre ? m.actual.ebitda : m.actual.netCash);
+
+        const allVals = [...seriesA, ...seriesB, ...seriesLine, 0];
+        const maxVal = Math.max(...allVals) * 1.12;
+        const minVal = Math.min(0, Math.min(...allVals) * 1.15);
+        const range = maxVal - minVal || 1;
+
+        const yFor = (val) => pad.top + ((maxVal - val) / range) * plotH;
+        const zeroY = yFor(0);
+
+        // Horizontal gridlines
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        const steps = 4;
+        for (let i = 0; i <= steps; i++) {
+          const val = minVal + (range * i) / steps;
+          const y = yFor(val);
+          ctx.strokeStyle = gridColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(w - pad.right, y);
+          ctx.stroke();
+
+          ctx.fillStyle = muted;
+          const label = Math.abs(val) >= 1e6
+            ? `${(val / 1e6).toFixed(1).replace('.', ',')}M`
+            : `${Math.round(val / 1e3)}k`;
+          ctx.fillText(label, pad.left - 8, y);
+        }
+
+        // Bars
+        const groupW = plotW / months.length;
+        const barW = Math.max(6, Math.min(20, groupW * 0.28));
+        mainChartState.bars = [];
+
+        months.forEach((m, i) => {
+          const cx = pad.left + groupW * (i + 0.5);
+          const xA = cx - barW - 2;
+          const xB = cx + 2;
+
+          // Bar A
+          const yA = yFor(seriesA[i]);
+          ctx.fillStyle = c1;
+          ctx.beginPath();
+          ctx.roundRect(xA, Math.min(yA, zeroY), barW, Math.max(2, Math.abs(zeroY - yA)), [4, 4, 0, 0]);
+          ctx.fill();
+
+          // Bar B
+          const yB = yFor(seriesB[i]);
+          ctx.fillStyle = isDre ? c4 : c3;
+          ctx.beginPath();
+          ctx.roundRect(xB, Math.min(yB, zeroY), barW, Math.max(2, Math.abs(zeroY - yB)), [4, 4, 0, 0]);
+          ctx.fill();
+
+          // X label
+          ctx.fillStyle = muted;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(m.label, cx, h - pad.bottom + 8);
+
+          mainChartState.bars.push({
+            cx,
+            left: pad.left + groupW * i,
+            right: pad.left + groupW * (i + 1),
+            month: m,
+            valA: seriesA[i],
+            valB: seriesB[i],
+            valLine: seriesLine[i]
+          });
+        });
+
+        // Overlay line (EBITDA or Net Cash)
+        ctx.strokeStyle = c2;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        months.forEach((m, i) => {
+          const cx = pad.left + groupW * (i + 0.5);
+          const yL = yFor(seriesLine[i]);
+          if (i === 0) ctx.moveTo(cx, yL);
+          else ctx.lineTo(cx, yL);
+        });
+        ctx.stroke();
+
+        months.forEach((m, i) => {
+          const cx = pad.left + groupW * (i + 0.5);
+          const yL = yFor(seriesLine[i]);
+          ctx.fillStyle = c2;
+          ctx.beginPath();
+          ctx.arc(cx, yL, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = cssVar('--card');
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        });
+
+        // Legend
+        const legendEl = document.getElementById('legend-main');
+        const items = isDre
+          ? [
+              { label: 'Receita Líquida', color: c1 },
+              { label: 'Custos + OPEX', color: c4 },
+              { label: 'EBITDA (Linha)', color: c2 }
+            ]
+          : [
+              { label: 'Fluxo Operacional (FCO)', color: c1 },
+              { label: 'Capex + Financ. (Saídas)', color: c3 },
+              { label: 'Geração Líquida de Caixa', color: c2 }
+            ];
+        legendEl.innerHTML = items.map((it) => `
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm inline-block" style="background: ${it.color};"></span>
+            <span>${it.label}</span>
+          </div>
+        `).join('');
+      }
+
+      function drawDonutChart(unitSummaries) {
+        const canvas = document.getElementById('canvas-donut');
+        const setup = setupCanvas(canvas);
+        if (!setup) return;
+        const { ctx, w, h } = setup;
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const radius = Math.min(w, h) * 0.42;
+        const innerR = radius * 0.64;
+
+        const filtered = unitSummaries.filter((u) => u.active);
+        const total = filtered.reduce((acc, u) => acc + u.netRev, 0) || 1;
+        let angle = -Math.PI / 2;
+
+        filtered.forEach((u) => {
+          const sliceAngle = (u.netRev / total) * Math.PI * 2;
+          ctx.fillStyle = cssVar(u.colorVar);
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, angle, angle + sliceAngle);
+          ctx.arc(cx, cy, innerR, angle + sliceAngle, angle, true);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.strokeStyle = cssVar('--card');
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          angle += sliceAngle;
+        });
+      }
+
+      function drawCashLineChart(months) {
+        const canvas = document.getElementById('canvas-cash-line');
+        const setup = setupCanvas(canvas);
+        if (!setup) return;
+        const { ctx, w, h } = setup;
+
+        const muted = cssVar('--muted-foreground');
+        const gridColor = cssVar('--card-border');
+        const lineCol = cssVar('--chart-2');
+        const pad = { top: 20, right: 20, bottom: 28, left: 64 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+
+        const vals = months.map((m) => m.endingCash);
+        const minV = Math.min(...vals) * 0.94;
+        const maxV = Math.max(...vals) * 1.04;
+        const range = maxV - minV || 1;
+
+        const yFor = (v) => pad.top + ((maxV - v) / range) * plotH;
+
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 4; i++) {
+          const val = minV + (range * i) / 4;
+          const y = yFor(val);
+          ctx.strokeStyle = gridColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(w - pad.right, y);
+          ctx.stroke();
+
+          ctx.fillStyle = muted;
+          ctx.fillText(`R$ ${(val / 1e6).toFixed(1).replace('.', ',')}M`, pad.left - 8, y);
+        }
+
+        const stepX = months.length > 1 ? plotW / (months.length - 1) : plotW / 2;
+        cashLineState.points = months.map((m, i) => ({
+          x: months.length > 1 ? pad.left + i * stepX : pad.left + plotW / 2,
+          y: yFor(m.endingCash),
+          month: m
+        }));
+
+        // Area fill
+        if (cashLineState.points.length > 1) {
+          const grad = ctx.createLinearGradient(0, pad.top, 0, h - pad.bottom);
+          grad.addColorStop(0, `color-mix(in srgb, ${lineCol} 28%, transparent)`);
+          grad.addColorStop(1, `color-mix(in srgb, ${lineCol} 0%, transparent)`);
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          cashLineState.points.forEach((p, idx) => {
+            if (idx === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+          });
+          ctx.lineTo(cashLineState.points[cashLineState.points.length - 1].x, h - pad.bottom);
+          ctx.lineTo(cashLineState.points[0].x, h - pad.bottom);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Line
+        ctx.strokeStyle = lineCol;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        cashLineState.points.forEach((p, idx) => {
+          if (idx === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.stroke();
+
+        // Points & X labels
+        cashLineState.points.forEach((p) => {
+          ctx.fillStyle = lineCol;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = cssVar('--card');
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = muted;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(p.month.label, p.x, h - pad.bottom + 8);
+        });
+
+        document.getElementById('cf-ending-cash').textContent = fmtBRL.format(months[months.length - 1].endingCash);
+      }
+
+      // =========================================================================
+      // 6. DRE GERENCIAL
+      // =========================================================================
+      function renderDRE(totals) {
+        const a = totals.actual;
+        const c = totals.comp;
+        const netRev = a.netRev || 1;
+        document.getElementById('dre-comp-header').textContent =
+          state.view === 'actual' ? 'Orçado (R$)' : '2025 (R$)';
+
+        const rows = [
+          { id: 'gross', label: 'Receita Operacional Bruta', val: a.grossRev, comp: c.grossRev, bold: true, goodIfUp: true },
+          { id: 'ded', label: '(-) Deduções e Impostos s/ Vendas', val: -a.deductions, comp: -c.deductions, toggle: 'ded', goodIfUp: true },
+          ...(state.dreExpanded.ded ? [
+            { label: 'ISS / PIS / COFINS', val: -a.deductions, comp: -c.deductions, indent: true, goodIfUp: true }
+          ] : []),
+          { label: '(=) Receita Operacional Líquida', val: a.netRev, comp: c.netRev, bold: true, highlight: true, goodIfUp: true },
+          { label: '(-) Custos dos Serviços Prestados (CPV / Cloud)', val: -a.cogs, comp: -c.cogs, goodIfUp: true },
+          { label: '(=) Lucro Bruto', val: a.grossProfit, comp: c.grossProfit, bold: true, highlight: true, goodIfUp: true },
+          { id: 'opex', label: '(-) Despesas Operacionais (OPEX)', val: -a.opexTotal, comp: -c.opexTotal, toggle: 'opex', bold: true, goodIfUp: true },
+          ...(state.dreExpanded.opex ? [
+            { label: 'Pessoal & Encargos', val: -a.opexPessoal, comp: -c.opexPessoal, indent: true, goodIfUp: true },
+            { label: 'Marketing & Vendas', val: -a.opexMkt, comp: -c.opexMkt, indent: true, goodIfUp: true },
+            { label: 'Pesquisa & Desenvolvimento (P&D)', val: -a.opexPd, comp: -c.opexPd, indent: true, goodIfUp: true },
+            { label: 'Despesas Gerais & Administrativas (G&A)', val: -a.opexGa, comp: -c.opexGa, indent: true, goodIfUp: true }
+          ] : []),
+          { label: '(=) EBITDA Gerencial', val: a.ebitda, comp: c.ebitda, bold: true, highlight: true, goodIfUp: true },
+          { label: '(-) Depreciação & Amortização (D&A)', val: -a.da, comp: -c.da, goodIfUp: true },
+          { label: '(=) EBIT (Lucro Operacional)', val: a.ebit, comp: c.ebit, bold: true, goodIfUp: true },
+          { label: '(+/-) Resultado Financeiro Líquido', val: a.finResult, comp: c.finResult, goodIfUp: true },
+          { label: '(=) LAIR (Lucro Antes do IR/CSLL)', val: a.ebt, comp: c.ebt, bold: true, goodIfUp: true },
+          { label: '(-) Provisão IRPJ / CSLL', val: -a.irCsll, comp: -c.irCsll, goodIfUp: true },
+          { label: '(=) Lucro Líquido do Exercício', val: a.netIncome, comp: c.netIncome, bold: true, highlight: true, goodIfUp: true }
+        ];
+
+        const tbody = document.getElementById('dre-tbody');
+        tbody.innerHTML = rows.map((r) => {
+          const av = (r.val / netRev) * 100;
+          const diff = r.val - r.comp;
+          const ah = r.comp ? (diff / Math.abs(r.comp)) * 100 : 0;
+          const isFavorable = diff >= 0;
+          const diffColor = Math.abs(diff) < 1 ? 'text-[var(--muted-foreground)]' : (isFavorable ? 'text-[var(--success)]' : 'text-[var(--error)]');
+          const rowBg = r.highlight ? 'bg-[var(--content)]' : '';
+          const fontCls = r.bold ? 'font-semibold text-[var(--foreground)]' : 'text-[var(--foreground)]';
+          const padCls = r.indent ? 'pl-6 text-[var(--muted-foreground)]' : '';
+
+          const toggleBtn = r.toggle
+            ? `<button type="button" data-dre-toggle="${r.toggle}" class="inline-flex items-center gap-1.5 text-left hover:text-[var(--primary)]">
+                 <span class="text-xs">${state.dreExpanded[r.toggle] ? '▾' : '▸'}</span>
+                 <span>${r.label}</span>
+               </button>`
+            : r.label;
+
+          return `
+            <tr class="${rowBg}">
+              <td class="py-2.5 pr-4 ${fontCls} ${padCls}">${toggleBtn}</td>
+              <td class="py-2.5 px-3 text-right tabular-nums ${fontCls}">${fmtBRL.format(r.val)}</td>
+              <td class="py-2.5 px-3 text-right tabular-nums text-[var(--muted-foreground)]">${fmtPct.format(av)}%</td>
+              <td class="py-2.5 px-3 text-right tabular-nums text-[var(--muted-foreground)]">${fmtBRL.format(r.comp)}</td>
+              <td class="py-2.5 px-3 text-right tabular-nums ${diffColor}">${diff >= 0 ? '+' : ''}${fmtBRL.format(diff)}</td>
+              <td class="py-2.5 pl-3 text-right tabular-nums ${diffColor}">${ah >= 0 ? '+' : ''}${fmtPct.format(ah)}%</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // =========================================================================
+      // 7. LANÇAMENTOS & EXPORTAÇÃO CSV
+      // =========================================================================
+      function renderTransactions() {
+        const search = document.getElementById('tx-search').value.trim().toLowerCase();
+        const typeFilter = document.getElementById('tx-filter-type').value;
+        const [start, end] = PERIOD_RANGES[state.period];
+
+        const filtered = transactions.filter((t) => {
+          if (t.monthIndex < start || t.monthIndex > end) return false;
+          if (state.unit !== 'all' && t.unit !== state.unit) return false;
+          if (typeFilter !== 'all' && t.type !== typeFilter) return false;
+          if (search && !t.desc.toLowerCase().includes(search) && !t.category.toLowerCase().includes(search)) return false;
+          return true;
+        });
+
+        document.getElementById('tx-count-label').textContent = `${filtered.length} lançamento(s) no filtro atual`;
+
+        const tbody = document.getElementById('tx-tbody');
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-[var(--muted-foreground)]">Nenhum lançamento encontrado para este filtro.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((t) => {
+          const isIn = t.type === 'entrada';
+          const statusCls = t.status === 'Liquidado' ? 'badge-success' : 'badge-warning';
+          const valCls = isIn ? 'text-[var(--success)]' : 'text-[var(--error)]';
+          const dateBr = t.date.split('-').reverse().join('/');
+          return `
+            <tr>
+              <td class="py-2.5 pr-3 tabular-nums text-[var(--muted-foreground)] whitespace-nowrap">${dateBr}</td>
+              <td class="py-2.5 px-3 font-medium text-[var(--foreground)]">
+                ${escapeHtml(t.desc)}
+                <span class="block text-xs font-normal text-[var(--muted-foreground)]">${UNITS[t.unit].name}</span>
+              </td>
+              <td class="py-2.5 px-3 text-[var(--muted-foreground)]">${escapeHtml(t.category)}</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full text-xs ${statusCls}">${t.status}</span></td>
+              <td class="py-2.5 pl-3 text-right font-semibold tabular-nums whitespace-nowrap ${valCls}">
+                ${isIn ? '+' : '-'}${fmtBRL.format(t.amount)}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function escapeHtml(str) {
+        return str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+      }
+
+      function downloadCSV(filename, rows) {
+        const csv = rows.map((r) => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // =========================================================================
+      // 8. SIMULADOR DE CENÁRIOS 2027
+      // =========================================================================
+      function renderSimulator() {
+        // Always simulate on FY 2026 base of selected unit
+        const unitKeys = state.unit === 'all' ? Object.keys(UNITS) : [state.unit];
+        let baseNet = 0, baseCogs = 0, baseOpex = 0, baseDa = 0, baseFin = 0;
+        MONTHLY_DATA.forEach((m) => {
+          unitKeys.forEach((u) => {
+            const a = m.units[u].actual;
+            baseNet += a.netRev;
+            baseCogs += a.cogs;
+            baseOpex += a.opexTotal;
+            baseDa += a.da;
+            baseFin += a.finResult;
+          });
+        });
+        const baseEbitda = baseNet - baseCogs - baseOpex;
+        const baseEbt = baseEbitda - baseDa + baseFin;
+        const baseNetInc = baseEbt - (baseEbt > 0 ? baseEbt * 0.24 : 0);
+
+        const g = state.sim.growth / 100;
+        const churn = state.sim.churn / 100;
+        const eff = state.sim.cloudEff / 100;
+        const opexVar = state.sim.opex / 100;
+
+        const simNet = baseNet * (1 + g - churn);
+        const simCogs = baseCogs * (1 + (g - churn) * 0.65) * (1 + eff);
+        const simOpex = baseOpex * (1 + opexVar);
+        const simEbitda = simNet - simCogs - simOpex;
+        const simEbt = simEbitda - baseDa * 1.05 + baseFin * 1.15;
+        const simNetInc = simEbt - (simEbt > 0 ? simEbt * 0.24 : 0);
+
+        const simEbitdaMargin = simNet ? (simEbitda / simNet) * 100 : 0;
+        const netGrowthPct = baseNet ? ((simNet - baseNet) / baseNet) * 100 : 0;
+        const rule40 = netGrowthPct + simEbitdaMargin;
+
+        document.getElementById('sim-growth-val').textContent = `${state.sim.growth >= 0 ? '+' : ''}${state.sim.growth}%`;
+        document.getElementById('sim-cloud-eff-val').textContent = `${state.sim.cloudEff >= 0 ? '+' : ''}${state.sim.cloudEff}%`;
+        document.getElementById('sim-opex-val').textContent = `${state.sim.opex >= 0 ? '+' : ''}${state.sim.opex}%`;
+        document.getElementById('sim-churn-val').textContent = `${fmtPct.format(state.sim.churn)}%`;
+
+        const r40Badge = document.getElementById('sim-rule40-badge');
+        r40Badge.textContent = `Rule of 40: ${fmtPct.format(rule40)} pts`;
+        r40Badge.className = `text-xs font-medium px-2.5 py-1 rounded-full ${rule40 >= 40 ? 'badge-success' : (rule40 >= 25 ? 'badge-warning' : 'badge-error')}`;
+
+        const simCards = [
+          { label: 'Receita Líq. 2027', val: formatCompactBRL(simNet), diff: ((simNet - baseNet) / baseNet) * 100 },
+          { label: 'EBITDA 2027', val: formatCompactBRL(simEbitda), diff: ((simEbitda - baseEbitda) / Math.abs(baseEbitda)) * 100 },
+          { label: 'Margem EBITDA', val: `${fmtPct.format(simEbitdaMargin)}%`, diff: simEbitdaMargin - (baseEbitda / baseNet) * 100, isPts: true },
+          { label: 'Lucro Líquido 2027', val: formatCompactBRL(simNetInc), diff: ((simNetInc - baseNetInc) / Math.abs(baseNetInc)) * 100 }
+        ];
+
+        document.getElementById('sim-kpi-cards').innerHTML = simCards.map((c) => {
+          const pos = c.diff >= 0;
+          const cls = pos ? 'text-[var(--success)]' : 'text-[var(--error)]';
+          const suffix = c.isPts ? ' p.p.' : '% vs 26';
+          return `
+            <div class="p-3 rounded-lg bg-[var(--content)] border border-[var(--card-border)] space-y-1">
+              <div class="text-xs text-[var(--muted-foreground)]">${c.label}</div>
+              <div class="text-base font-bold tabular-nums text-[var(--foreground)]">${c.val}</div>
+              <div class="text-xs font-medium tabular-nums ${cls}">${pos ? '+' : ''}${fmtPct.format(c.diff)}${suffix}</div>
+            </div>
+          `;
+        }).join('');
+
+        drawSimChart(
+          { net: baseNet, ebitda: baseEbitda, netInc: baseNetInc },
+          { net: simNet, ebitda: simEbitda, netInc: simNetInc }
+        );
+      }
+
+      function drawSimChart(base, sim) {
+        const canvas = document.getElementById('canvas-sim');
+        const setup = setupCanvas(canvas);
+        if (!setup) return;
+        const { ctx, w, h } = setup;
+
+        const fg = cssVar('--foreground');
+        const muted = cssVar('--muted-foreground');
+        const gridColor = cssVar('--card-border');
+        const cBase = cssVar('--chart-4');
+        const cSim = cssVar('--chart-1');
+
+        const pad = { top: 26, right: 20, bottom: 32, left: 60 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+
+        const cats = [
+          { label: 'Receita Líquida', b: base.net, s: sim.net },
+          { label: 'EBITDA', b: base.ebitda, s: sim.ebitda },
+          { label: 'Lucro Líquido', b: base.netInc, s: sim.netInc }
+        ];
+
+        const vals = cats.flatMap((c) => [c.b, c.s, 0]);
+        const maxV = Math.max(...vals) * 1.15;
+        const minV = Math.min(0, Math.min(...vals) * 1.15);
+        const range = maxV - minV || 1;
+        const yFor = (v) => pad.top + ((maxV - v) / range) * plotH;
+        const zeroY = yFor(0);
+
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 4; i++) {
+          const val = minV + (range * i) / 4;
+          const y = yFor(val);
+          ctx.strokeStyle = gridColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(w - pad.right, y);
+          ctx.stroke();
+          ctx.fillStyle = muted;
+          ctx.fillText(`${(val / 1e6).toFixed(1).replace('.', ',')}M`, pad.left - 8, y);
+        }
+
+        const groupW = plotW / cats.length;
+        const barW = Math.min(44, groupW * 0.25);
+
+        cats.forEach((c, i) => {
+          const cx = pad.left + groupW * (i + 0.5);
+          const x1 = cx - barW - 4;
+          const x2 = cx + 4;
+
+          const y1 = yFor(c.b);
+          ctx.fillStyle = cBase;
+          ctx.beginPath();
+          ctx.roundRect(x1, Math.min(y1, zeroY), barW, Math.max(2, Math.abs(zeroY - y1)), [4, 4, 0, 0]);
+          ctx.fill();
+
+          const y2 = yFor(c.s);
+          ctx.fillStyle = cSim;
+          ctx.beginPath();
+          ctx.roundRect(x2, Math.min(y2, zeroY), barW, Math.max(2, Math.abs(zeroY - y2)), [4, 4, 0, 0]);
+          ctx.fill();
+
+          ctx.fillStyle = fg;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(formatCompactBRL(c.s).replace('R$ ', ''), x2 + barW / 2, Math.min(y2, zeroY) - 4);
+
+          ctx.fillStyle = muted;
+          ctx.textBaseline = 'top';
+          ctx.fillText(c.label, cx, h - pad.bottom + 8);
+        });
+      }
+
+      // =========================================================================
+      // 9. ORQUESTRAÇÃO E EVENTOS
+      // =========================================================================
+      function updateAll() {
+        const months = getFilteredMonths();
+        const totals = sumMetrics(months);
+
+        const periodText = document.getElementById('filter-period').selectedOptions[0].text;
+        const unitText = document.getElementById('filter-unit').selectedOptions[0].text;
+        document.getElementById('context-badge').textContent = `${unitText} • ${periodText}`;
+
+        if (state.activeTab === 'overview') {
+          renderKPIs(months, totals);
+          drawMainChart(months);
+          renderUnitBreakdown(totals);
+          renderCostBars(totals);
+          renderHealthMetrics(totals);
+        } else if (state.activeTab === 'dre') {
+          renderDRE(totals);
+        } else if (state.activeTab === 'cashflow') {
+          drawCashLineChart(months);
+          renderTransactions();
+        } else if (state.activeTab === 'simulator') {
+          renderSimulator();
+        }
+      }
+
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.activeTab = btn.dataset.tab;
+          document.querySelectorAll('.tab-btn').forEach((b) => {
+            const active = b === btn;
+            b.classList.toggle('tab-active', active);
+            b.classList.toggle('tab-inactive', !active);
+          });
+          document.querySelectorAll('.tab-panel').forEach((panel) => {
+            panel.classList.toggle('hidden', panel.id !== `tab-${state.activeTab}`);
+          });
+          requestAnimationFrame(updateAll);
+        });
+      });
+
+      // Global filters
+      document.getElementById('filter-period').addEventListener('change', (e) => {
+        state.period = e.target.value;
+        updateAll();
+      });
+      document.getElementById('filter-unit').addEventListener('change', (e) => {
+        state.unit = e.target.value;
+        updateAll();
+      });
+      document.getElementById('filter-view').addEventListener('change', (e) => {
+        state.view = e.target.value;
+        updateAll();
+      });
+
+      // Main chart toggle
+      document.getElementById('btn-chart-dre').addEventListener('click', () => {
+        state.mainChartMode = 'dre';
+        document.getElementById('btn-chart-dre').className = 'text-xs px-2.5 py-1 rounded-md font-medium tab-active';
+        document.getElementById('btn-chart-cash').className = 'text-xs px-2.5 py-1 rounded-md font-medium tab-inactive';
+        drawMainChart(getFilteredMonths());
+      });
+      document.getElementById('btn-chart-cash').addEventListener('click', () => {
+        state.mainChartMode = 'cash';
+        document.getElementById('btn-chart-cash').className = 'text-xs px-2.5 py-1 rounded-md font-medium tab-active';
+        document.getElementById('btn-chart-dre').className = 'text-xs px-2.5 py-1 rounded-md font-medium tab-inactive';
+        drawMainChart(getFilteredMonths());
+      });
+
+      // Hover tooltips for main canvas
+      const mainCanvas = document.getElementById('canvas-main');
+      const mainTooltip = document.getElementById('tooltip-main');
+      mainCanvas.addEventListener('mousemove', (e) => {
+        const rect = mainCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const hit = mainChartState.bars.find((b) => x >= b.left && x <= b.right);
+        if (!hit) {
+          mainTooltip.classList.add('hidden');
+          return;
+        }
+        const isDre = state.mainChartMode === 'dre';
+        const l1 = isDre ? 'Receita Líquida' : 'Fluxo Operacional (FCO)';
+        const l2 = isDre ? 'Custos + OPEX' : 'Capex + Financ.';
+        const l3 = isDre ? 'EBITDA' : 'Geração Líquida';
+        const margin = hit.month.actual.netRev ? (hit.month.actual.ebitda / hit.month.actual.netRev) * 100 : 0;
+
+        mainTooltip.innerHTML = `
+          <div class="font-semibold text-[var(--foreground)] mb-1">${hit.month.label} / 2026</div>
+          <div class="flex justify-between gap-4 text-[var(--muted-foreground)]"><span>${l1}:</span><span class="tabular-nums text-[var(--foreground)]">${fmtBRL.format(hit.valA)}</span></div>
+          <div class="flex justify-between gap-4 text-[var(--muted-foreground)]"><span>${l2}:</span><span class="tabular-nums text-[var(--foreground)]">${fmtBRL.format(hit.valB)}</span></div>
+          <div class="flex justify-between gap-4 text-[var(--muted-foreground)]"><span>${l3}:</span><span class="tabular-nums font-semibold text-[var(--success)]">${fmtBRL.format(hit.valLine)}</span></div>
+          ${isDre ? `<div class="mt-1 pt-1 border-t border-[var(--card-border)] flex justify-between text-[var(--muted-foreground)]"><span>Margem EBITDA:</span><span class="tabular-nums text-[var(--foreground)]">${fmtPct.format(margin)}%</span></div>` : ''}
+        `;
+        mainTooltip.classList.remove('hidden');
+        const tipX = Math.min(rect.width - 210, Math.max(8, x + 12));
+        mainTooltip.style.left = `${tipX}px`;
+        mainTooltip.style.top = '12px';
+      });
+      mainCanvas.addEventListener('mouseleave', () => mainTooltip.classList.add('hidden'));
+
+      // Hover tooltips for cash line canvas
+      const cashCanvas = document.getElementById('canvas-cash-line');
+      const cashTooltip = document.getElementById('tooltip-cash-line');
+      cashCanvas.addEventListener('mousemove', (e) => {
+        const rect = cashCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        let closest = null;
+        let minDist = 36;
+        cashLineState.points.forEach((p) => {
+          const d = Math.abs(p.x - x);
+          if (d < minDist) { minDist = d; closest = p; }
+        });
+        if (!closest) {
+          cashTooltip.classList.add('hidden');
+          return;
+        }
+        const m = closest.month;
+        cashTooltip.innerHTML = `
+          <div class="font-semibold text-[var(--foreground)] mb-1">${m.label} / 2026</div>
+          <div class="flex justify-between gap-4 text-[var(--muted-foreground)]"><span>Saldo Final:</span><span class="tabular-nums font-semibold text-[var(--foreground)]">${fmtBRL.format(m.endingCash)}</span></div>
+          <div class="flex justify-between gap-4 text-[var(--muted-foreground)]"><span>Geração Líq.:</span><span class="tabular-nums text-[var(--success)]">${m.actual.netCash >= 0 ? '+' : ''}${fmtBRL.format(m.actual.netCash)}</span></div>
+        `;
+        cashTooltip.classList.remove('hidden');
+        cashTooltip.style.left = `${Math.min(rect.width - 200, Math.max(8, closest.x + 12))}px`;
+        cashTooltip.style.top = '12px';
+      });
+      cashCanvas.addEventListener('mouseleave', () => cashTooltip.classList.add('hidden'));
+
+      // DRE expand toggles & export
+      document.getElementById('dre-tbody').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-dre-toggle]');
+        if (!btn) return;
+        const key = btn.dataset.dreToggle;
+        state.dreExpanded[key] = !state.dreExpanded[key];
+        renderDRE(sumMetrics(getFilteredMonths()));
+      });
+      document.getElementById('btn-dre-expand').addEventListener('click', () => {
+        const allOpen = state.dreExpanded.opex && state.dreExpanded.ded;
+        state.dreExpanded.opex = !allOpen;
+        state.dreExpanded.ded = !allOpen;
+        document.getElementById('btn-dre-expand').textContent = allOpen ? 'Expandir Tudo' : 'Recolher Tudo';
+        renderDRE(sumMetrics(getFilteredMonths()));
+      });
+      document.getElementById('btn-export-dre').addEventListener('click', () => {
+        const totals = sumMetrics(getFilteredMonths());
+        const a = totals.actual, c = totals.comp;
+        const compName = state.view === 'actual' ? 'Orçado' : '2025';
+        const rows = [
+          ['Conta', 'Realizado (R$)', `${compName} (R$)`, 'Desvio (R$)'],
+          ['Receita Bruta', a.grossRev, c.grossRev, a.grossRev - c.grossRev],
+          ['Deduções', -a.deductions, -c.deductions, -(a.deductions - c.deductions)],
+          ['Receita Líquida', a.netRev, c.netRev, a.netRev - c.netRev],
+          ['CPV / Cloud', -a.cogs, -c.cogs, -(a.cogs - c.cogs)],
+          ['Lucro Bruto', a.grossProfit, c.grossProfit, a.grossProfit - c.grossProfit],
+          ['OPEX Total', -a.opexTotal, -c.opexTotal, -(a.opexTotal - c.opexTotal)],
+          ['EBITDA', a.ebitda, c.ebitda, a.ebitda - c.ebitda],
+          ['Lucro Líquido', a.netIncome, c.netIncome, a.netIncome - c.netIncome]
+        ];
+        downloadCSV(`dre_vertice_${state.period}_${state.unit}.csv`, rows);
+      });
+
+      // Transactions search, filter, add, export
+      document.getElementById('tx-search').addEventListener('input', renderTransactions);
+      document.getElementById('tx-filter-type').addEventListener('change', renderTransactions);
+      document.getElementById('btn-export-tx').addEventListener('click', () => {
+        const rows = [['Data', 'Descrição', 'Unidade', 'Categoria', 'Status', 'Tipo', 'Valor (R$)']];
+        transactions.forEach((t) => {
+          rows.push([t.date, t.desc, UNITS[t.unit].name, t.category, t.status, t.type, t.type === 'entrada' ? t.amount : -t.amount]);
+        });
+        downloadCSV('lancamentos_vertice_2026.csv', rows);
+      });
+
+      document.getElementById('tx-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const desc = document.getElementById('tx-desc').value.trim();
+        const type = document.getElementById('tx-type').value;
+        const amount = Number(document.getElementById('tx-amount').value);
+        const unit = document.getElementById('tx-unit').value;
+        const status = document.getElementById('tx-status').value;
+        if (!desc || !amount) return;
+
+        const targetMonth = PERIOD_RANGES[state.period][1];
+        const mStr = String(targetMonth + 1).padStart(2, '0');
+        transactions.unshift({
+          id: Date.now(),
+          date: `2026-${mStr}-24`,
+          monthIndex: targetMonth,
+          desc,
+          category: type === 'entrada' ? 'Simulação Entrada' : 'Simulação Despesa',
+          unit,
+          type,
+          status,
+          amount
+        });
+        state.extraCashByMonth[targetMonth] += (type === 'entrada' ? amount : -amount);
+        document.getElementById('tx-desc').value = '';
+        updateAll();
+      });
+
+      // Simulator inputs & presets
+      ['sim-growth', 'sim-cloud-eff', 'sim-opex', 'sim-churn'].forEach((id) => {
+        document.getElementById(id).addEventListener('input', () => {
+          state.sim.growth = Number(document.getElementById('sim-growth').value);
+          state.sim.cloudEff = Number(document.getElementById('sim-cloud-eff').value);
+          state.sim.opex = Number(document.getElementById('sim-opex').value);
+          state.sim.churn = Number(document.getElementById('sim-churn').value);
+          renderSimulator();
+        });
+      });
+
+      const PRESETS = {
+        conservador: { growth: 10, cloudEff: 0, opex: 4, churn: 4.5 },
+        base: { growth: 22, cloudEff: -4, opex: 10, churn: 2.0 },
+        agressivo: { growth: 42, cloudEff: -8, opex: 24, churn: 1.5 }
+      };
+      function applySimPreset(p) {
+        state.sim = { ...p };
+        document.getElementById('sim-growth').value = p.growth;
+        document.getElementById('sim-cloud-eff').value = p.cloudEff;
+        document.getElementById('sim-opex').value = p.opex;
+        document.getElementById('sim-churn').value = p.churn;
+        renderSimulator();
+      }
+      document.querySelectorAll('.preset-btn').forEach((btn) => {
+        btn.addEventListener('click', () => applySimPreset(PRESETS[btn.dataset.preset]));
+      });
+      document.getElementById('btn-reset-sim').addEventListener('click', () => applySimPreset(PRESETS.base));
+
+      // Live Theme Sync & Resize handling
+      window.addEventListener('themechange', updateAll);
+      window.addEventListener('resize', () => requestAnimationFrame(updateAll));
+
+      // Initial render
+      updateAll();
+    })();
+  </script>
+</body>
+</html>
